@@ -1,3 +1,5 @@
+
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -13,13 +15,12 @@ pricePerSqftCSV = pd.read_csv('pricepersqft.csv')
 colCSV = colCSV.set_index('City')
 citiesCSV = citiesCSV.set_index('City')
 result = colCSV.join(citiesCSV)
+result = result.join(qolCSV)
 result = result.dropna()
 # result = pd.concat([colCSV, citiesCSV], axis=1, join='inner')
 st.write(result)
-st.write("TEST")
 
-df = px.data.carshare()
-fig = px.scatter_mapbox(df, lat="centroid_lat", lon="centroid_lon", color="peak_hour", size="car_hours",
-                  color_continuous_scale=px.colors.cyclical.IceFire, size_max=15, zoom=10,
-                  mapbox_style="carto-positron")
+fig = px.scatter_mapbox(result, lat="lat", lon="lng", hover_name="Country", hover_data=["Gasoline", "Cinema"],
+                        color_discrete_sequence=["fuchsia"], zoom=3, height=300)
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 st.plotly_chart(fig)
