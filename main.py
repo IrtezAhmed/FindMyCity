@@ -11,9 +11,9 @@ st.write("With our app, you can find just that.")
 cities = pd.read_csv('cities.csv').set_index('City')
 CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
 QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
-prices = pd.read_csv('price.csv').set_index('City')
-pricesSQFT = pd.read_csv('pricepersqft.csv').set_index('City')
+#prices = pd.read_csv('price.csv').set_index('City')
+#pricesSQFT = pd.read_csv('pricepersqft.csv').set_index('City')
 
-merged = QoL.join(cities).join(CoL).join(prices).join(pricesSQFT)
+merged = QoL.join(cities).join(CoL)
 
 st.write(merged)
