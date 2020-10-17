@@ -8,17 +8,12 @@ st.write("John Denver's words **impacted millions**. Now it's time for it to imp
 st.write("With our app, you can find just that.")
 
 #reading all CSV files
-cities = pd.read_csv('cities.csv')
-CoL = pd.read_csv('movehubcostofliving.csv')
-QoL = pd.read_csv('movehubqualityoflife.csv')
-prices = pd.read_csv('price.csv')
-pricesSQFT = pd.read_csv('pricepersqft.csv')
+cities = pd.read_csv('cities.csv').set_index('City')
+CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
+QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
+prices = pd.read_csv('price.csv').set_index('City')
+pricesSQFT = pd.read_csv('pricepersqft.csv').set_index('City')
 
+merged = QoL.join(cities).join(CoL).join(prices).join(pricesSQFT)
 
-
-
-st.write(cities)
-st.write(CoL)
-st.write(QoL)
-st.write(prices)
-st.write(pricesSQFT)
+st.write(merged)
