@@ -110,14 +110,14 @@ while len(clusterDict[str(userLabel[0])])>3 and count<3:
 #color all cities within the same cluster as green, and all the other clusters closer to red
 
 finalLabel = pd.DataFrame(read_labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
-#resultFinal = resultFinal.join(finalLabel)
+result = result.join(label)
 
 #end clustering algorithm
 
 # math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
 # st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
 #May need to multiply final answer by a certain amount
-fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
+fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="Cluster", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
                         color_continuous_scale=px.colors.diverging.RdYlGn, zoom=1, mapbox_style="carto-positron", size_max=15)
 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
