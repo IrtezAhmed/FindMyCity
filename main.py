@@ -54,7 +54,30 @@ userJob = st.slider("How important is the local job market for you? (1 = Not imp
 userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)
 actualClimate = int(userClimate*600)+40
 
-####ALGO
+#clustering algorithm
+st.write('TRAINING......')
+model = KMeans(n_clusters = 5, n_init=5, init='random')
+model.fit(resultFinal)
+#labels = model.predict(resultFinal)
+pickle.dump(model, open('mode.sav', 'wb'))
+st.write("TRAINING COMPLETE.")
+
+np.save('label.npy', labels)
+st.write('TRAINING COMPLETE')
+clusterVal = pd.DataFrame(labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
+
+#creates dictionary values that are easily accessible
+clusterDict = {}
+n = 0
+for clusterNum in labels:
+    clusterNum = str(clusterNum)
+    if clusterNum in clusterDict:
+        clusterDict[clusterNum].append(rows[n])
+    else:
+        clusterDict[clusterNum] = [rows[n]]
+    n+=1
+
+np.save('dictionary.npy', clusterDict)
 
 loadModel = pickle.load(open('mode.sav', 'rb'))
 read_labels = np.load('label.npy',allow_pickle='TRUE')
