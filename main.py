@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 import math
 import plotly.express as px
+import pickle
 
 st.title("Find My City")
 st.write("**'Take Me Home, Country Roads'**")
@@ -31,7 +32,11 @@ result['Temp'] = result['Value']
 result['Unemployment Rate'] = result['Rate']
 result = result.drop(columns=['Rank', 'Value', 'Rate'])
 
-st.write(result)
+#results isolated to relevant information
+resultFinal = result[['density', 'Average Rental Cost', 'Temp', 'Unemployment Rate']]
+
+
+st.write(resultFinal) #final result
 
 rows = list(result.index)
 
@@ -44,16 +49,17 @@ userRent = st.slider("How much rent are you willing to pay? (Specify a range)", 
 userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)
 userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)
 
-#clustering algorithm
-
-st.write(result)
-
+'''#clustering algorithm
+st.write('TRAINING......')
 model = KMeans(n_clusters = 100, n_init=100, init='random')
-model.fit(result)
+model.fit(resultFinal)
+#labels = model.predict(resultFinal)
+pickle.dump(model, open('mode.sav', 'wb'))
+st.write("TRAINING COMPLETE.")
 
-labels = model.predict(result)
-
-clusterVal = pd.DataFrame(labels, columns=['Cluster'], index = rows)
+np.save('label.npy', labels)
+st.write('TRAINING COMPLETE')
+clusterVal = pd.DataFrame(labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
 
 #creates dictionary values that are easily accessible
 clusterDict = {}
@@ -66,21 +72,26 @@ for clusterNum in labels:
         clusterDict[clusterNum] = [rows[n]]
     n+=1
 
-#printing the dictionary out
-for clusterNum in clusterDict:
-    st.write("Cluster Number:", clusterNum)
-    for city in clusterDict[clusterNum]:
-        st.write(city)
+np.save('dictionary.npy', clusterDict)'''
 
-#distance to center of cluster --> convert to DF
-'''clusterDistance = model.transform(result)**2
-distanceDF = pd.DataFrame(clusterDistance, columns=['Square Distance'], index = rows)'''
+loadModel = pickle.load(open('mode.sav', 'rb'))
+read_labels = np.load('label.npy',allow_pickle='TRUE')
+read_dictionary = np.load('dictionary.npy',allow_pickle='TRUE')
 
 #receiving input from user
-'''userValues = [userPop, userRent, userJob, userClimate]
-userDF = pd.DataFrame(userValues, columns=['Population', 'Average Rent', 'Job Market'])
-userLabel = model.predict()
-'''
+userValues = [userPop, userRent, userClimate, userJob]
+userDF = pd.DataFrame(userValues, columns=['density', 'Average Rental Cost', 'Temp', 'Unemployment Rate'], index = "User Data")
+userLabel = loadModel.predict()
+
+st.write(userLabel)
+
+#return list of cities within relevant cluster
+
+
+#printing the dictionary out
+'''for clusterNum in clusterDict:
+    for city in clusterDict[clusterNum]:
+        st.write(city)'''
 
 #color all cities within the same cluster as green, and all the other clusters closer to red
 
