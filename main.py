@@ -55,15 +55,15 @@ userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)
 actualClimate = int(userClimate*600)+40
 
 #clustering algorithm
-st.write('TRAINING......')
-model = KMeans(n_clusters = 100, n_init=100, init='random')
+
+model = KMeans(n_clusters = 10, n_init=10, init='random')
 model.fit(resultFinal)
 labels = model.predict(resultFinal)
 pickle.dump(model, open('mode.sav', 'wb'))
-st.write("TRAINING COMPLETE.")
+
 
 np.save('label.npy', labels)
-st.write('TRAINING COMPLETE')
+
 clusterVal = pd.DataFrame(labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
 
 #creates dictionary values that are easily accessible
@@ -91,6 +91,12 @@ userLabel = loadModel.predict(userDF)
 
 #st.write(userLabel)
 
+import random
+randomlist = []
+for i in range(0,8595):
+    n = random.randint(1,100)
+    randomlist.append(n)
+
 #return list of cities within relevant cluster
 
 clusterDict = read_dictionary
@@ -112,12 +118,14 @@ while len(clusterDict[str(userLabel[0])])>3 and count<3:
 finalLabel = pd.DataFrame(read_labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
 #resultFinal = resultFinal.join(finalLabel)
 
+num = len(rows)
+rand = np.random.rand(1,8595)
 #end clustering algorithm
 
 # math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
 # st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
 #May need to multiply final answer by a certain amount
-fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
+fig = px.scatter_mapbox(result, lat="lat", lon="lng", color=randomlist, hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
                         color_continuous_scale=px.colors.diverging.RdYlGn, zoom=1, mapbox_style="carto-positron", size_max=15)
 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
