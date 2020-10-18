@@ -15,30 +15,24 @@ st.title("Find My City")
 # cities = pd.read_csv('cities.csv').set_index('City')
 # CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
 # QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
-prices = pd.read_csv('prices.csv').set_index('City')
+prices = pd.read_csv('prices.csv')
 tempCSV = pd.read_csv('tempByState.csv')
 statesCSV = pd.read_csv('states.csv')
 citiesCSV = pd.read_csv('uscities.csv')
+rateCSV = pd.read_csv('unemployment_rate.csv')
 
-citiesCSV = citiesCSV[['city', 'city_ascii', 'state_id', 'state_name', 'lat', 'lng', 'density']]
-citiesCSV = citiesCSV.set_index('city')
+citiesCSV = citiesCSV.join(tempCSV.set_index('Location'), on='state_name')
+citiesCSV['location'] = citiesCSV['city'] + citiesCSV['county_name']
+prices['location'] = prices['City'] + prices['County']
 
+result = citiesCSV.join(prices.set_index('location'), on='location')
+result = result.dropna().set_index('city')
+result = result[['state_id', 'state_name', 'county_name', 'lat', 'lng', 'population', 'density', 'Value', 'Average Rental Cost']]
 
-statesCSV = statesCSV.set_index('State')
-tempCSV = tempCSV.set_index('Location')
-tempCSV = tempCSV.join(statesCSV)
-tempCSV = tempCSV[['Value', 'Code']]
-tempCSV['State'] = tempCSV['Code']
-
-# result = cities.join(QoL).join(CoL)
-result = prices.join(tempCSV.set_index('State'), on='State')
+result = result.join(rateCSV.set_index('State'), on='state_name')
 result['Temp'] = result['Value']
-result = result.dropna().drop(columns=['Code', 'Value'])
-st.write(result)
-st.write(citiesCSV)
-
-
-result = citiesCSV.join(result, on=['city_ascii'])
+result['Unemployment Rate'] = result['Rate']
+result = result.drop(columns=['Rank', 'Value', 'Rate'])
 
 st.write(result)
 
