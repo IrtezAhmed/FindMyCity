@@ -1,20 +1,18 @@
-import streamlit as st
+from sklearn import cluster
+from sklearn.cluster import KMeans
+import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
-import plotly.express as px
+import streamlit as st
 import math
+import plotly.express as px
+import pickle
 
 st.title("Find My City")
-#st.write("**Take Me Home, Country Roads**")
+st.write("**'Take Me Home, Country Roads'**")
+st.write("John Denver's words **impacted millions**. Now it's time for it to impact you - where is your home, country roads?")
+st.write("With our app, you can find just that.")
 
-#st.write("John Denver's words **impacted millions**. Now it's time for it to impact you - where is your home, country roads?")
-
-#st.write("With our app, you can find just that.")
-
-#reading all CSV files
-# citiesRef = pd.read_csv('cities.csv')
-# cities = pd.read_csv('cities.csv').set_index('City')
-# CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
-# QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
 prices = pd.read_csv('prices.csv')
 tempCSV = pd.read_csv('tempByState.csv')
 statesCSV = pd.read_csv('states.csv')
@@ -34,17 +32,64 @@ result['Temp'] = result['Value']
 result['Unemployment Rate'] = result['Rate']
 result = result.drop(columns=['Rank', 'Value', 'Rate'])
 
-st.write(result)
+#results isolated to relevant information
+resultFinal = result[['density', 'Average Rental Cost', 'Temp', 'Unemployment Rate']]
 
-rows = list(result.index)
+
+st.write(resultFinal) #final result
+
+rows = list(resultFinal.index)
 
 userLocation = st.selectbox("Where do you live right now?", rows)
-#st.write(userLocation)
+
+userLat = result.loc[userLocation]['lat']
+userLng = result.loc[userLocation]['lng']
+
 userDistance = st.slider("How far are you willing to move away?", 0, 10000, 0, 200)
-userPop = st.slider("How populated do you want this city to be? (1 = Sparse, 5 = Crowded)", 1, 5, 1)
+
+userPop = st.slider("How populated do you want this city to be? (1 = Sparse, 5 = Crowded)", 1, 5, 1)*6600
 userRent = st.slider("How much rent are you willing to pay? (Specify a range)", 600, 22000, (3000, 6000), 100)
-userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)
+userRentMedian =  int((userRent[0] +  userRent[1])/2)
+userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)*200
 userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)
+actualClimate = int(userClimate*600)+40
+
+####ALGO
+
+loadModel = pickle.load(open('mode.sav', 'rb'))
+read_labels = np.load('label.npy',allow_pickle='TRUE')
+read_dictionary = np.load('dictionary.npy',allow_pickle='TRUE').item()
+
+#receiving input from user
+userValues = {"density": userPop, "Average Rental Cost":userRentMedian, "Temp":actualClimate, "Unemployment Rate":userJob}
+userDF = pd.DataFrame(data=userValues, index = ['User'])
+st.write(userDF)
+userLabel = loadModel.predict(userDF)
+
+#st.write(userLabel)
+
+#return list of cities within relevant cluster
+
+clusterDict = read_dictionary
+
+st.write('**Here are the top 3 cities recommended for you!**')
+
+#printing the dictionary out
+count = 0
+while len(clusterDict[str(userLabel[0])])>3 and count<3:
+    for city in clusterDict[str(userLabel[0])]:
+        if count <3:
+            st.write(city)
+            count+=1
+        else:
+            break
+
+#color all cities within the same cluster as green, and all the other clusters closer to red
+
+finalLabel = pd.DataFrame(read_labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
+#resultFinal = resultFinal.join(finalLabel)
+
+#end clustering algorithm
 
 # math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
 # st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
