@@ -13,13 +13,25 @@ st.title("Find My City")
 #reading all CSV files
 citiesRef = pd.read_csv('cities.csv')
 cities = pd.read_csv('cities.csv').set_index('City')
-CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
-QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
-prices = pd.read_csv('price.csv').set_index('City')
+# CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
+# QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
+prices = pd.read_csv('prices.csv').set_index('City')
+tempCSV = pd.read_csv('tempByState.csv')
+statesCSV = pd.read_csv('states.csv')
 
-result = cities.join(QoL).join(CoL)
+statesCSV = statesCSV.set_index('State')
+tempCSV = tempCSV.set_index('Location')
+tempCSV = tempCSV.join(statesCSV)
+tempCSV = tempCSV[['Value', 'Code']]
+tempCSV['State'] = tempCSV['Code']
+st.write(tempCSV)
 
-result = result.dropna()
+# result = cities.join(QoL).join(CoL)
+st.write(prices)
+result = prices.join(tempCSV.set_index('State'), on='State')
+result['Temp'] = result['Value']
+result = result.dropna().drop(columns=['Code', 'Value'])
+st.write(result)
 
 rows = list(result.index)
 
