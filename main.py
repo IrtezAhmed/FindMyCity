@@ -44,10 +44,11 @@ userLocation = st.selectbox("Where do you live right now?", rows)
 #st.write(userLocation)
 
 userDistance = st.slider("How far are you willing to move away?", 0, 10000, 0, 200)
-userPop = st.slider("How populated do you want this city to be? (1 = Sparse, 5 = Crowded)", 1, 5, 1)
+userPop = st.slider("How populated do you want this city to be? (1 = Sparse, 5 = Crowded)", 1, 5, 1)*6600
 userRent = st.slider("How much rent are you willing to pay? (Specify a range)", 600, 22000, (3000, 6000), 100)
-userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)
-userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)
+userRentMedian =  int((userRent[0] +  userRent[1])/2)
+userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)*13
+userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)*14
 
 '''#clustering algorithm
 st.write('TRAINING......')
@@ -76,22 +77,23 @@ np.save('dictionary.npy', clusterDict)'''
 
 loadModel = pickle.load(open('mode.sav', 'rb'))
 read_labels = np.load('label.npy',allow_pickle='TRUE')
-read_dictionary = np.load('dictionary.npy',allow_pickle='TRUE')
+read_dictionary = np.load('dictionary.npy',allow_pickle='TRUE').item()
 
 #receiving input from user
-userValues = [userPop, userRent, userClimate, userJob]
-userDF = pd.DataFrame(userValues, columns=['density', 'Average Rental Cost', 'Temp', 'Unemployment Rate'], index = "User Data")
-userLabel = loadModel.predict()
+userValues = {"density": userPop, "Average Rental Cost":userRentMedian, "Temp":userClimate, "Unemployment Rate":userJob}
+userDF = pd.DataFrame(data=userValues, index = ['User'])
+st.write(userDF)
+userLabel = loadModel.predict(userDF)
 
 st.write(userLabel)
 
 #return list of cities within relevant cluster
 
+clusterDict = read_dictionary
 
 #printing the dictionary out
-'''for clusterNum in clusterDict:
-    for city in clusterDict[clusterNum]:
-        st.write(city)'''
+for city in clusterDict[str(userLabel[0])]:
+    st.write(city)
 
 #color all cities within the same cluster as green, and all the other clusters closer to red
 
