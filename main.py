@@ -38,43 +38,23 @@ resultFinal = result[['density', 'Average Rental Cost', 'Temp', 'Unemployment Ra
 
 st.write(resultFinal) #final result
 
-rows = list(result.index)
+rows = list(resultFinal.index)
 
 userLocation = st.selectbox("Where do you live right now?", rows)
-#st.write(userLocation)
+
+userLat = result.loc[userLocation]['lat']
+userLng = result.loc[userLocation]['lng']
 
 userDistance = st.slider("How far are you willing to move away?", 0, 10000, 0, 200)
+
 userPop = st.slider("How populated do you want this city to be? (1 = Sparse, 5 = Crowded)", 1, 5, 1)*6600
 userRent = st.slider("How much rent are you willing to pay? (Specify a range)", 600, 22000, (3000, 6000), 100)
 userRentMedian =  int((userRent[0] +  userRent[1])/2)
-userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)*13
+userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)*200
 userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)
-actualClimate = int(userClimate*6)+40
+actualClimate = int(userClimate*600)+40
 
-'''#clustering algorithm
-st.write('TRAINING......')
-model = KMeans(n_clusters = 100, n_init=100, init='random')
-model.fit(resultFinal)
-#labels = model.predict(resultFinal)
-pickle.dump(model, open('mode.sav', 'wb'))
-st.write("TRAINING COMPLETE.")
-
-np.save('label.npy', labels)
-st.write('TRAINING COMPLETE')
-clusterVal = pd.DataFrame(labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
-
-#creates dictionary values that are easily accessible
-clusterDict = {}
-n = 0
-for clusterNum in labels:
-    clusterNum = str(clusterNum)
-    if clusterNum in clusterDict:
-        clusterDict[clusterNum].append(rows[n])
-    else:
-        clusterDict[clusterNum] = [rows[n]]
-    n+=1
-
-np.save('dictionary.npy', clusterDict)'''
+####ALGO
 
 loadModel = pickle.load(open('mode.sav', 'rb'))
 read_labels = np.load('label.npy',allow_pickle='TRUE')
@@ -86,27 +66,37 @@ userDF = pd.DataFrame(data=userValues, index = ['User'])
 st.write(userDF)
 userLabel = loadModel.predict(userDF)
 
-st.write(userLabel)
+#st.write(userLabel)
 
 #return list of cities within relevant cluster
 
 clusterDict = read_dictionary
 
+st.write('**Here are the top 3 cities recommended for you!**')
+
 #printing the dictionary out
-for city in clusterDict[str(userLabel[0])]:
-    st.write(city)
+count = 0
+while len(clusterDict[str(userLabel[0])])>3 and count<3:
+    for city in clusterDict[str(userLabel[0])]:
+        if count <3:
+            st.write(city)
+            count+=1
+        else:
+            break
 
 #color all cities within the same cluster as green, and all the other clusters closer to red
 
+finalLabel = pd.DataFrame(read_labels, columns=['Cluster'], index = rows) #creates a DF of cities to their respective clusters
+#resultFinal = resultFinal.join(finalLabel)
 
 #end clustering algorithm
 
 # math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
 # st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
 #May need to multiply final answer by a certain amount
-'''fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
+fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
                         color_continuous_scale=px.colors.diverging.RdYlGn, zoom=1, mapbox_style="carto-positron", size_max=15)
 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-st.plotly_chart(fig)'''
+st.plotly_chart(fig)
