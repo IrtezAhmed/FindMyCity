@@ -41,11 +41,11 @@ for clusterNum in labels:
     n+=1
 
 #printing the dictionary out
-for clusterNum in clusterDict:
+'''for clusterNum in clusterDict:
     st.write("Cluster Number:", clusterNum)
     for city in clusterDict[clusterNum]:
-        st.write(city)
+        st.write(city)'''
 
-
-
+#receiving input from user
+userLabel = 
 
