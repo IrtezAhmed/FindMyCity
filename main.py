@@ -56,7 +56,7 @@ actualClimate = int(userClimate*600)+40
 
 #clustering algorithm
 st.write('TRAINING......')
-model = KMeans(n_clusters = 5, n_init=5, init='random')
+model = KMeans(n_clusters = 100, n_init=100, init='random')
 model.fit(resultFinal)
 labels = model.predict(resultFinal)
 pickle.dump(model, open('mode.sav', 'wb'))
