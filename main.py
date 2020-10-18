@@ -14,6 +14,7 @@ citiesRef = pd.read_csv('cities.csv')
 cities = pd.read_csv('cities.csv').set_index('City')
 CoL = pd.read_csv('movehubcostofliving.csv').set_index('City')
 QoL = pd.read_csv('movehubqualityoflife.csv').set_index('City')
+prices = pd.read_csv('price.csv').set_index('City')
 
 result = cities.join(QoL).join(CoL)
 
