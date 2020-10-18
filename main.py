@@ -49,7 +49,7 @@ userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)
 # math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
 # st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
 #May need to multiply final answer by a certain amount
-fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="Movehub Rating", hover_name=rows, hover_data=[range(len(rows)),range(len(rows))], size="Quality of Life", 
+fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
                         color_continuous_scale=px.colors.diverging.RdYlGn, zoom=1, mapbox_style="carto-positron", size_max=15)
 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
