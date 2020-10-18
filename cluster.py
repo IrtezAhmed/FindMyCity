@@ -47,5 +47,7 @@ for clusterNum in labels:
         st.write(city)'''
 
 #receiving input from user
-userLabel = 
-
+'''userValues = [userPop, userRent, userJob, userClimate]
+userDF = pd.DataFrame(userValues, columns=['Population', 'Average Rent', 'Job Market'])
+userLabel = model.predict()
+'''
