@@ -37,6 +37,7 @@ rows = list(result.index)
 
 userLocation = st.selectbox("Where do you live right now?", rows)
 #st.write(userLocation)
+
 userDistance = st.slider("How far are you willing to move away?", 0, 10000, 0, 200)
 userPop = st.slider("How populated do you want this city to be? (1 = Sparse, 5 = Crowded)", 1, 5, 1)
 userRent = st.slider("How much rent are you willing to pay? (Specify a range)", 600, 22000, (3000, 6000), 100)
@@ -47,7 +48,7 @@ userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)
 
 st.write(result)
 
-model = KMeans(n_clusters = 8, n_init=100, init='random')
+model = KMeans(n_clusters = 100, n_init=100, init='random')
 model.fit(result)
 
 labels = model.predict(result)
@@ -66,10 +67,10 @@ for clusterNum in labels:
     n+=1
 
 #printing the dictionary out
-'''for clusterNum in clusterDict:
+for clusterNum in clusterDict:
     st.write("Cluster Number:", clusterNum)
     for city in clusterDict[clusterNum]:
-        st.write(city)'''
+        st.write(city)
 
 #distance to center of cluster --> convert to DF
 '''clusterDistance = model.transform(result)**2
@@ -98,9 +99,9 @@ userLabel = model.predict()
 # math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
 # st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
 #May need to multiply final answer by a certain amount
-fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
+'''fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="population", hover_name=rows, hover_data=['Average Rental Cost',"Temp"], size="density", 
                         color_continuous_scale=px.colors.diverging.RdYlGn, zoom=1, mapbox_style="carto-positron", size_max=15)
 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-st.plotly_chart(fig)
+st.plotly_chart(fig)'''
