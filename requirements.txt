@@ -1,0 +1,6 @@
+streamlit==0.62.0
+pandas
+plotly.express
+sklearn
+numpy
+matplotlib
