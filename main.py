@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import math
 
 st.title("Find My City")
 #st.write("**Take Me Home, Country Roads**")
@@ -30,9 +31,9 @@ userRent = st.slider("How much rent are you willing to pay? (Specify a range)", 
 userJob = st.slider("How important is the local job market for you? (1 = Not important, 5 = Very important", 1, 5, 1)
 userClimate = st.slider("What kind of climate do you prefer? (1 = Cold, 5 = Hot)", 1, 5, 1)
 
-st.write(userRent[0])
-st.write(userRent[1])
-
+# math.sqrt(((lat2 - lat1)*111)**2 + ((lon2 - lon1)*111)**2)
+# st.write(math.sqrt(((result["lat"][1] - result["lat"][2])*111)**2 + ((result["lng"][1] - result["lng"][2])*111)**2))
+#May need to multiply final answer by a certain amount
 fig = px.scatter_mapbox(result, lat="lat", lon="lng", color="Movehub Rating", hover_name=rows, hover_data=[range(len(rows)),range(len(rows))], size="Quality of Life", 
                         color_continuous_scale=px.colors.diverging.RdYlGn, zoom=1, mapbox_style="carto-positron", size_max=15)
 
